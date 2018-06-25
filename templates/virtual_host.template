@@ -1,0 +1,53 @@
+
+    server_name DOMAIN www.DOMAIN;
+    root /www/ROOT_DIR;
+    index index.php index.html index.htm;
+
+    error_log LOG_DIR/error.log notice;
+    access_log LOG_DIR/access.log;
+
+    fastcgi_intercept_errors off;
+
+    # Do not log favicon.ico requests
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    # Do not log robots.txt requests
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    # Do not log images requests
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires max;
+        log_not_found off;
+        access_log off;
+    }
+    location / {
+        # This is cool because no php is touched for static content.
+        # include the "?$args" part so non-default permalinks doesn't break when using query string
+        try_files $uri $uri/ /index.php?$args;
+    }
+    location /RequestDenied {
+        return 418;
+    }
+
+    location ~ \.php(|/.*)$ {
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include fastcgi.conf;
+        fastcgi_param PHP_VALUE "error_log=LOG_DIR/DOMAIN.php.error.log";
+        fastcgi_intercept_errors on;
+        fastcgi_pass unix:/var/run/php5-CLEAN_DOMAIN-fpm.sock;
+    }
+    # Prevent access to Apache .htaccess/.htpasswd files
+    location ~ /\.ht {
+        deny  all;
+    }
+
+    # Redirect 403 errors to 404 error to fool attackers
+        error_page 403 = 404;
+    }

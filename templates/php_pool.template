@@ -1,0 +1,16 @@
+; Start a new pool named 'CLEAN_DOMAIN'.
+; the variable $pool can we used in any directive and will be replaced by the
+; pool name ('CLEAN_DOMAIN' here)
+[CLEAN_DOMAIN]
+user = www-data
+group = www-data
+listen = /var/run/php5-CLEAN_DOMAIN-fpm.sock
+listen.owner = www-data
+listen.group = www-data
+; Choose how the process manager will control the number of child processes.
+pm = ondemand
+pm.max_children = 50
+pm.process_idle_timeout = 10s
+pm.max_requests = 500
+request_slowlog_timeout = 100s
+request_terminate_timeout = 300
